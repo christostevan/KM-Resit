@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { GeneralFetch } from "../../../Service/request";
+import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
 
 const Forecasting = () => {
@@ -16,13 +16,11 @@ const Forecasting = () => {
       const [data, setData] = useState<jsonDataTemplate[]>([]);
     
       useEffect(() => {
-    
-    
         fetchingAPI();
       }, []);
     
       async function fetchingAPI() {
-        const jsonData = await GeneralFetch();
+        const jsonData = await ForecastFetch();
         const ans = [];
         for(let i = 0; i < jsonData["daily"]["time"].length; i++) {
           const data = {
