@@ -1,9 +1,7 @@
 
 export const ForecastFetch = async (): Promise<any> => {
     let tomorrow: String = dateToString(getDatePlus(1));
-    console.log(tomorrow);
     let tenDays: String = dateToString(getDatePlus(10));
-    console.log(tenDays);
     const base_url = `https://api.open-meteo.com/v1/forecast?latitude=52.7792&longitude=6.9069&daily=temperature_2m_max,temperature_2m_min,windspeed_10m_max,winddirection_10m_dominant&timezone=auto&start_date=${tomorrow}&end_date=${tenDays}`;
     console.log(base_url);
     try {
@@ -19,7 +17,6 @@ export const ForecastFetch = async (): Promise<any> => {
 
 export const CityFetch = async (city: String): Promise<any> => {
     try {
-
         if (city === null) {
             throw new Error("City cannot be null");
         }
@@ -45,7 +42,7 @@ function getDatePlus(day: number): Date {
     return currentDate;
 }
 
-function dateToString(date_object: Date): string {
+function dateToString(date_object: Date): String {
     let dateString: string =
         date_object.getFullYear() +
         "-" +

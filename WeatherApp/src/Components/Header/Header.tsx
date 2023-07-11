@@ -6,25 +6,27 @@ const Header = () => {
 
     return (
         <View style={styles.container}>
-          <Text style={styles.h1}>Weather App</Text>
-          <StatusBar style="auto" />
+            <Text style={styles.h1}>Weather App</Text>
+            <StatusBar style="auto" />
         </View>
-      );
+    );
 };
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: "#5D7879",
-      height: 100,
-      alignItems: 'center',
-      justifyContent: 'center',
+        width: "100%",
+        flexDirection: "row",
+        paddingHorizontal: 16,
+        backgroundColor: "#5D7879",
+        height: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     h1: {
-      fontSize: 20,
-      
+        fontSize: 20,
+
     }
-  });
+});
 
 
 
