@@ -4,20 +4,26 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Forecasting from "./src/Components/Body/Forecasting/Forecasting";
-import Historical from "./src/Historical/Historical";
+import Historical from "./src/Components/Body/Historical/Historical";
 
-const Stack = createStackNavigator();
+// Type checking navigator. Make 'screens' directory to contain screens that the app has
+export type RootStackParamList = {
+  Forecasting: undefined;
+  Historical: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
 
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Stack.Navigator initialRouteName="Forecast"
+      <Stack.Navigator initialRouteName="Forecasting"
         screenOptions={{
           headerShown: false, // Hide navigation bar by default
         }}>
-        <Stack.Screen name="Forecast" component={Forecasting} />
+        <Stack.Screen name="Forecasting" component={Forecasting} />
         <Stack.Screen name="Historical" component={Historical} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -2,25 +2,33 @@ import React from "react";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableHighlight } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import Historical from "../../Historical/Historical";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../App";
 
-/*
-Could you maybe look into getting access to firebase cloud functions? You need to accept a pay as you go plan to access it. 
-It will only start to cost money after 2 million requests, so that should not form a problem. For some reason 
-however it continuously says I cant accept it.
-*/
+// Defines screen on the root path
+type historicalScreenProp = StackNavigationProp<RootStackParamList, "Historical", "Forecasting">;
 
 const Header: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<historicalScreenProp>();
 
     const handlePressHistorical = () => {
         navigation.navigate("Historical");
     }
 
+    const handlePressTitle = () => {
+        navigation.navigate("Forecasting");
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.titleSection}>
-                <Text style={styles.h1}>Weather App</Text>
+                <TouchableHighlight
+                    underlayColor="transparent"
+                    onPress={() => handlePressTitle()}
+                    testID="title-navigate"
+                >
+                    <Text style={styles.h1}>Weather App</Text>
+                </TouchableHighlight>
             </View>
             <View style={styles.menuSection}>
                 <TouchableHighlight
@@ -49,6 +57,8 @@ const styles = StyleSheet.create({
     titleSection: {
         flex: 1,
         alignItems: "flex-start",
+        width: "80%",
+        textAlign: "center"
     },
     h1: {
         fontSize: 20,
@@ -58,6 +68,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-around",
+        width: 50
     },
     menuText: {
         color: "white",
