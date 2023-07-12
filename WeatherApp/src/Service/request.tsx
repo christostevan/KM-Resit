@@ -32,10 +32,9 @@ export const CityFetch = async (city: String): Promise<any> => {
             throw new Error("Error while retrieving data");
         }
         return response.json();
-    } catch(err: any) {
+    } catch (err: any) {
         throw new Error("Error while fetching" + err.message);
     }
-
 }
 
 // Getting the Date from today + user input day 
@@ -58,4 +57,27 @@ function dateToString(date_object: Date): String {
         "-" +
         date_object.getDate();
     return dateString;
+}
+
+export const HistoricalFetch = async (latitude: Number, longitude: Number): Promise<any> => {
+    // If user hasn't set up the city yet; the initial city is Emmen, NL
+    if (latitude === 0 && longitude === 0) {
+        latitude = 52.7792;
+        longitude = 6.9069;
+    }
+    let today: Date = new Date();
+    let todayString: String = dateToString(today);
+    let twentyYears: Date = today;
+    twentyYears.setFullYear(today.getFullYear() - 20);
+    let twentyYearsString: String = dateToString(twentyYears);
+    const base_url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${twentyYearsString}&end_date=${todayString}&daily=temperature_2m_mean,precipitation_sum&timezone=GMT`;
+    try {
+        const response = await fetch(base_url);
+        if (!response.ok) {
+            throw new Error("Error while retrieving data");
+        }
+        return response.json();
+    } catch (err: any) {
+        throw new Error("There is an error while fetching the historical data: " + err.message);
+    }
 }

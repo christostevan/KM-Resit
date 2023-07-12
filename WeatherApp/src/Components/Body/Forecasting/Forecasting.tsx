@@ -5,7 +5,7 @@ import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
 
-const Forecasting = () => {
+const Forecasting: React.FC = () => {
     const [date, setDate] = useState<String[]>([]);
     const [maxTemp, setMaxTemp] = useState<Number[]>([]);
     const [minTemp, setMinTemp] = useState<Number[]>([]);
@@ -21,7 +21,7 @@ const Forecasting = () => {
         fetchingAPI();
     }, []);
 
-    const handleSubmit = async(): Promise<any> => {
+    const handleSubmit = async (): Promise<any> => {
         if (inputValue != '' || inputValue != null || inputValue) {
             const jsonData = await CityFetch(inputValue);
             setLatitude(jsonData["results"][0]["latitude"]);
@@ -35,39 +35,39 @@ const Forecasting = () => {
     function determineWindDirection(windDirection: number): String {
         if (between(windDirection, 0, 22.4)) {
             return "North wind (N)";
-        } else if(between(windDirection, 22.5, 44)) {
+        } else if (between(windDirection, 22.5, 44)) {
             return "North-northeast wind (NNE)"
-        } else if(between(windDirection, 45, 67.4)) {
+        } else if (between(windDirection, 45, 67.4)) {
             return "Northeast wind (NE)"
-        } else if(between(windDirection, 67.5, 89)) {
+        } else if (between(windDirection, 67.5, 89)) {
             return "East-northeast (ENE)"
-        } else if(between(windDirection, 90, 112.4)) {
+        } else if (between(windDirection, 90, 112.4)) {
             return "East wind (E)"
-        } else if(between(windDirection, 112.5, 134)) {
+        } else if (between(windDirection, 112.5, 134)) {
             return "East-southeast wind (ESE)"
-        } else if(between(windDirection, 135, 157.4)) {
+        } else if (between(windDirection, 135, 157.4)) {
             return "South-east wind (SE)"
-        } else if(between(windDirection, 157.5, 179)) {
+        } else if (between(windDirection, 157.5, 179)) {
             return "South-southeast wind (SSE)"
-        } else if(between(windDirection, 180, 202.4)) {
+        } else if (between(windDirection, 180, 202.4)) {
             return "South wind (S)"
-        } else if(between(windDirection, 202.5, 224)) {
+        } else if (between(windDirection, 202.5, 224)) {
             return "South-southeast wind (SSW)"
-        } else if(between(windDirection, 225, 247.4)) {
+        } else if (between(windDirection, 225, 247.4)) {
             return "South-west wind (SW)"
-        } else if(between(windDirection, 247.5, 269)) {
+        } else if (between(windDirection, 247.5, 269)) {
             return "West-southeast wind (WSW)"
-        } else if(between(windDirection, 270, 292.4)) {
+        } else if (between(windDirection, 270, 292.4)) {
             return "West wind (W)"
-        } else if(between(windDirection, 292.5, 314)) {
+        } else if (between(windDirection, 292.5, 314)) {
             return "West-northwest wind (WNW)"
-        } else if(between(windDirection, 315, 337.4)) {
+        } else if (between(windDirection, 315, 337.4)) {
             return "North-west wind (NW)"
-        } else if(between(windDirection, 337.5, 359)) {
+        } else if (between(windDirection, 337.5, 359)) {
             return "North-northwest wind (NNW)"
         }
         return "North Wind (N)"
-    } 
+    }
 
     // Determine is a number is between specific range
     function between(x: number, min: number, max: number): boolean {
@@ -87,8 +87,18 @@ const Forecasting = () => {
         let minTemp: Number[] = [];
         let windDir: String[] = [];
         let windSpeed: Number[] = [];
+        const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         for (let i = 0; i < jsonData["daily"]["time"].length; i++) {
-            dateData.push(jsonData["daily"]["time"][i]);
+            const date: Date = new Date(jsonData["daily"]["time"][i].toString());
+            let dateString: String =
+                weekday[date.getDay()] +
+                ", " +
+                date.getDate() +
+                "-" +
+                date.toLocaleString('default', {month: 'long'}) +
+                "-" +
+                date.getFullYear();
+            dateData.push(dateString);
             maxTemp.push(jsonData["daily"]["temperature_2m_max"][i]);
             minTemp.push(jsonData["daily"]["temperature_2m_min"][i]);
             let wind_direction: String = determineWindDirection(jsonData["daily"]["winddirection_10m_dominant"][i]);
@@ -105,7 +115,7 @@ const Forecasting = () => {
     return (
         <View style={styles.container}>
             <Header />
-            <Text>Current city: {cityName}, {country}</Text>
+            <Text style={{marginBottom: 10}}>Current city: {cityName}, {country}</Text>
             <View style={styles.table}>
                 <View style={styles.column}>
                     <Text>Date</Text>
@@ -120,7 +130,7 @@ const Forecasting = () => {
                     {minTemp?.map((el, i) => <Text key={i}> {el.toString()}</Text>)}
                 </View>
                 <View style={styles.column}>
-                    <Text>Wind Speed</Text>
+                    <Text>Wind Speed (Km/h)</Text>
                     {windSpeed?.map((el, i) => <Text key={i}> {el.toString()} </Text>)}
                 </View>
                 <View>
@@ -136,7 +146,7 @@ const Forecasting = () => {
                     onChangeText={text => setInputValue(text)}
                     placeholder="Input your city here...."
                 />
-                <Button title="Submit" onPress={handleSubmit}/>
+                <Button title="Submit" onPress={handleSubmit} />
             </View>
         </View>
     );
