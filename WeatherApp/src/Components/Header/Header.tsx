@@ -8,7 +8,7 @@ import { RootStackParamList } from "../../../App";
 // Defines screen on the root path
 type historicalScreenProp = StackNavigationProp<RootStackParamList, "Historical", "Forecasting">;
 
-const Header: React.FC = () => {
+const Header = () => {
     const navigation = useNavigation<historicalScreenProp>();
 
     const handlePressHistorical = () => {

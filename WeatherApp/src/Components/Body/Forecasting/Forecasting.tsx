@@ -5,6 +5,49 @@ import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
 
+
+export function determineWindDirection(windDirection: number): String {
+    if (between(windDirection, 0, 22.4)) {
+        return "North wind (N)";
+    } else if (between(windDirection, 22.5, 44)) {
+        return "North-northeast wind (NNE)"
+    } else if (between(windDirection, 45, 67.4)) {
+        return "Northeast wind (NE)"
+    } else if (between(windDirection, 67.5, 89)) {
+        return "East-northeast wind (ENE)"
+    } else if (between(windDirection, 90, 112.4)) {
+        return "East wind (E)"
+    } else if (between(windDirection, 112.5, 134)) {
+        return "East-southeast wind (ESE)"
+    } else if (between(windDirection, 135, 157.4)) {
+        return "South-east wind (SE)"
+    } else if (between(windDirection, 157.5, 179)) {
+        return "South-southeast wind (SSE)"
+    } else if (between(windDirection, 180, 202.4)) {
+        return "South wind (S)"
+    } else if (between(windDirection, 202.5, 224)) {
+        return "South-southwest wind (SSW)"
+    } else if (between(windDirection, 225, 247.4)) {
+        return "South-west wind (SW)"
+    } else if (between(windDirection, 247.5, 269)) {
+        return "West-southwest wind (WSW)"
+    } else if (between(windDirection, 270, 292.4)) {
+        return "West wind (W)"
+    } else if (between(windDirection, 292.5, 314)) {
+        return "West-northwest wind (WNW)"
+    } else if (between(windDirection, 315, 337.4)) {
+        return "North-west wind (NW)"
+    } else if (between(windDirection, 337.5, 359)) {
+        return "North-northwest wind (NNW)"
+    }
+    return "North wind (N)"
+}
+
+// Determine is a number is between specific range
+export function between(x: number, min: number, max: number): boolean {
+    return x >= min && x <= max;
+}
+
 const Forecasting: React.FC = () => {
     const [date, setDate] = useState<String[]>([]);
     const [maxTemp, setMaxTemp] = useState<Number[]>([]);
@@ -32,48 +75,6 @@ const Forecasting: React.FC = () => {
         }
     }
 
-    function determineWindDirection(windDirection: number): String {
-        if (between(windDirection, 0, 22.4)) {
-            return "North wind (N)";
-        } else if (between(windDirection, 22.5, 44)) {
-            return "North-northeast wind (NNE)"
-        } else if (between(windDirection, 45, 67.4)) {
-            return "Northeast wind (NE)"
-        } else if (between(windDirection, 67.5, 89)) {
-            return "East-northeast (ENE)"
-        } else if (between(windDirection, 90, 112.4)) {
-            return "East wind (E)"
-        } else if (between(windDirection, 112.5, 134)) {
-            return "East-southeast wind (ESE)"
-        } else if (between(windDirection, 135, 157.4)) {
-            return "South-east wind (SE)"
-        } else if (between(windDirection, 157.5, 179)) {
-            return "South-southeast wind (SSE)"
-        } else if (between(windDirection, 180, 202.4)) {
-            return "South wind (S)"
-        } else if (between(windDirection, 202.5, 224)) {
-            return "South-southeast wind (SSW)"
-        } else if (between(windDirection, 225, 247.4)) {
-            return "South-west wind (SW)"
-        } else if (between(windDirection, 247.5, 269)) {
-            return "West-southeast wind (WSW)"
-        } else if (between(windDirection, 270, 292.4)) {
-            return "West wind (W)"
-        } else if (between(windDirection, 292.5, 314)) {
-            return "West-northwest wind (WNW)"
-        } else if (between(windDirection, 315, 337.4)) {
-            return "North-west wind (NW)"
-        } else if (between(windDirection, 337.5, 359)) {
-            return "North-northwest wind (NNW)"
-        }
-        return "North Wind (N)"
-    }
-
-    // Determine is a number is between specific range
-    function between(x: number, min: number, max: number): boolean {
-        return x >= min && x <= max;
-    }
-
     async function fetchingAPI(): Promise<any> {
         if (cityName === '' || cityName === null) {
             setCityName("Emmen");
@@ -95,7 +96,7 @@ const Forecasting: React.FC = () => {
                 ", " +
                 date.getDate() +
                 "-" +
-                date.toLocaleString('default', {month: 'long'}) +
+                date.toLocaleString('default', { month: 'long' }) +
                 "-" +
                 date.getFullYear();
             dateData.push(dateString);
@@ -115,11 +116,11 @@ const Forecasting: React.FC = () => {
     return (
         <View style={styles.container}>
             <Header />
-            <Text style={{marginBottom: 10}}>Current city: {cityName}, {country}</Text>
+            <Text style={{ marginBottom: 10 }}>Current city: {cityName}, {country}</Text>
             <View style={styles.table}>
-                <View style={styles.column}>
-                    <Text>Date</Text>
-                    {date?.map((el, i) => <Text key={i}> {el} </Text>)}
+                <View style={styles.column} >
+                    <Text testID="Date-test">Date</Text>
+                    {date?.map((el, i) => <Text key={i} testID="date-element-test"> {el}</Text>)}
                 </View>
                 <View style={styles.column}>
                     <Text>Max Temp (°C)</Text>
@@ -145,8 +146,9 @@ const Forecasting: React.FC = () => {
                     value={inputValue}
                     onChangeText={text => setInputValue(text)}
                     placeholder="Input your city here...."
+                    testID="TextInput-test"
                 />
-                <Button title="Submit" onPress={handleSubmit} />
+                <Button title="Submit" onPress={handleSubmit} testID="SubmitButton-test"/>
             </View>
         </View>
     );

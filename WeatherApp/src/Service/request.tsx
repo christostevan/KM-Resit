@@ -88,7 +88,7 @@ export const HistoricalFetch = async (latitude: Number, longitude: Number): Prom
     }
     let todayString: String = dateToString(today);
     let twentyYears: Date = today;
-    twentyYears.setFullYear(today.getFullYear() - 3);
+    twentyYears.setFullYear(today.getFullYear() - 20);
     twentyYears.setDate(1);
     let twentyYearsString: String = dateToString(twentyYears);
 
