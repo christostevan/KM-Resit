@@ -41,12 +41,14 @@ export function determineWindDirection(windDirection: number): String {
         return "North-northwest wind (NNW)"
     }
     return "North wind (N)"
-}
+};
 
 // Determine is a number is between specific range
 export function between(x: number, min: number, max: number): boolean {
     return x >= min && x <= max;
-}
+};
+
+export const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const Forecasting: React.FC = () => {
     const [date, setDate] = useState<String[]>([]);
@@ -59,6 +61,12 @@ const Forecasting: React.FC = () => {
     const [longitude, setLongitude] = useState<number>(0);
     const [cityName, setCityName] = useState<String>('');
     const [country, setCountry] = useState<String>('');
+
+    const [parentWidth, setParentWidth] = useState(null);
+    const handleLayout = (event: any) => {
+      const { width } = event.nativeEvent.layout;
+      setParentWidth(width);
+    };
 
     useEffect(() => {
         fetchingAPI();
@@ -88,7 +96,6 @@ const Forecasting: React.FC = () => {
         let minTemp: Number[] = [];
         let windDir: String[] = [];
         let windSpeed: Number[] = [];
-        const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         for (let i = 0; i < jsonData["daily"]["time"].length; i++) {
             const date: Date = new Date(jsonData["daily"]["time"][i].toString());
             let dateString: String =
@@ -114,9 +121,9 @@ const Forecasting: React.FC = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} testID="parent-view" onLayout={handleLayout}>
             <Header />
-            <Text style={{ marginBottom: 10 }}>Current city: {cityName}, {country}</Text>
+            <Text style={{ marginBottom: 10 }} testID="current-city-test">Current city: {cityName}, {country}</Text>
             <View style={styles.table}>
                 <View style={styles.column} >
                     <Text testID="Date-test">Date</Text>
