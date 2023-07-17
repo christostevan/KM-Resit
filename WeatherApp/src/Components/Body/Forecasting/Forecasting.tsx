@@ -5,7 +5,6 @@ import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
 
-
 export function determineWindDirection(windDirection: number): String {
     if (between(windDirection, 0, 22.4)) {
         return "North wind (N)";

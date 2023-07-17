@@ -1,5 +1,5 @@
 // Basic fetching function
-const forecasting = async (base_url: RequestInfo) => {
+export const forecasting = async (base_url: RequestInfo) => {
     try {
         const response = await fetch(base_url);
         if (!response.ok) {
@@ -11,9 +11,13 @@ const forecasting = async (base_url: RequestInfo) => {
     }
 }
 
-// Forecasting for the audible alarm (hourly and daily forecast)
-export const DailyForecast = async () => {
-    const base_url = `https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,precipitation,rain,snowfall,snow_depth&daily=weathercode&timezone=auto&start_date=2023-07-12&end_date=2023-07-13`;
+// Hourly forecasting
+export const HourlyForecasting = async (latitude: Number, longitude: Number): Promise<any> => {
+    if (latitude === 0 && longitude === 0) {
+        latitude = 52.7792;
+        longitude = 6.9069;
+    }
+    const base_url = `http://localhost:3000/currentWeather?longitude=${longitude}&latitude=${latitude}`;
     return forecasting(base_url);
 };
 
@@ -41,7 +45,7 @@ export const CityFetch = async (city: String): Promise<any> => {
 };
 
 // Getting the Date from today + user input day 
-function getDatePlus(day: number): Date {
+export function getDatePlus(day: number): Date {
     if (day < 0 || day === null) {
         throw new Error("Day cannot be less than 0 or null");
     }
@@ -51,7 +55,7 @@ function getDatePlus(day: number): Date {
 };
 
 // Convert Date to String in yy-mm-dd format
-function dateToString(date_object: Date): String {
+export function dateToString(date_object: Date): String {
     let dateString: string =
         date_object.getFullYear() +
         "-" +
@@ -145,5 +149,9 @@ export function determineMonth(month: number): boolean {
 
 // Determine if it is a leap year or not
 export function determineLeapYear(year: number): boolean {
+    const leapYear: Number[] = [1700, 1800, 1900, 2100];
+    if (leapYear.includes(year)) {
+        return false;
+    } 
     return (year % 4) === 0;
 };
