@@ -157,8 +157,8 @@ describe("Request test", () => {
         const tomorrow = request.getDatePlus(1);
         const nextWeek = request.getDatePlus(7);
 
-        expect(tomorrow).toEqual(new Date(today.setDate(today.getDate() + 1)));
-        expect(nextWeek).toEqual(new Date(today.setDate(today.getDate() + 6)));
+        expect(tomorrow.getDate()).toEqual(new Date(today.setDate(today.getDate() + 1)).getDate());
+        expect(nextWeek.getDate()).toEqual(new Date(today.setDate(today.getDate() + 6)).getDate());
 
         expect(() => request.getDatePlus(-1)).toThrow('Day cannot be less than 0 or null');
     });

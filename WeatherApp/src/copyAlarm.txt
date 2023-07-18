@@ -1,0 +1,44 @@
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { Audio } from "expo-av";
+import * as Notification from "expo-notifications";
+import { PushNotification } from "react-native/Libraries/PushNotificationIOS/PushNotificationIOS";
+import { PrecipicationHourlyForecasting } from "../../../Service/request";
+
+const Alarm: React.FC = () => {
+    const [latitude, setLatitude] = useState<number>(0);
+    const [longitude, setLongitude] = useState<number>(0);
+    const [precipitation, setPrecipitation] = useState<String>('');
+
+    useEffect(() => {
+        fetchAPI();
+
+        if (precipitation != "null") {
+            // Set alarm date
+            const currentTime = new Date();
+        }
+
+        // Schedule subsequent API calls every hour
+        const interval = setInterval(() => {
+            fetchAPI();
+        }, 3600000); // 1 hr in milliseconds
+
+        return () => {
+            // Clear the interval when the component is unmounted
+            clearInterval(interval)
+        };
+    }, []);
+
+    async function fetchAPI(): Promise<any> {
+        const jsonData = await PrecipicationHourlyForecasting(0, 0);
+        setPrecipitation(jsonData["report"].toString());
+    };
+
+    return (
+        <View>
+
+        </View>
+    )
+}
+
+export default Alarm;

@@ -4,6 +4,7 @@ import { Table, Row, Rows } from "react-native-table-component";
 import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
+import Alarm from "../Alarm/Alarm";
 
 export function determineWindDirection(windDirection: number): String {
     if (between(windDirection, 0, 22.4)) {
@@ -46,6 +47,38 @@ export function determineWindDirection(windDirection: number): String {
 export function between(x: number, min: number, max: number): boolean {
     return x >= min && x <= max;
 };
+
+export function mapping(jsonData: any): any {
+    let ans = [];
+    let dateData: String[] = [];
+    let maxTemp: Number[] = [];
+    let minTemp: Number[] = [];
+    let windDir: String[] = [];
+    let windSpeed: Number[] = [];
+    for (let i = 0; i < jsonData["daily"]["time"].length; i++) {
+        const date: Date = new Date(jsonData["daily"]["time"][i].toString());
+        let dateString: String =
+            weekday[date.getDay()] +
+            ", " +
+            date.getDate() +
+            "-" +
+            date.toLocaleString('default', { month: 'long' }) +
+            "-" +
+            date.getFullYear();
+        dateData.push(dateString);
+        maxTemp.push(jsonData["daily"]["temperature_2m_max"][i]);
+        minTemp.push(jsonData["daily"]["temperature_2m_min"][i]);
+        let wind_direction: String = determineWindDirection(jsonData["daily"]["winddirection_10m_dominant"][i]);
+        windDir.push(wind_direction);
+        windSpeed.push(jsonData["daily"]["windspeed_10m_max"][i]);
+    }
+    ans.push(dateData);
+    ans.push(maxTemp);
+    ans.push(minTemp);
+    ans.push(windDir);
+    ans.push(windSpeed);
+    return ans;
+}
 
 export const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -90,38 +123,19 @@ const Forecasting: React.FC = () => {
             setCountry("NL");
         }
         const jsonData = await ForecastFetch(latitude, longitude);
-        let dateData: String[] = [];
-        let maxTemp: Number[] = [];
-        let minTemp: Number[] = [];
-        let windDir: String[] = [];
-        let windSpeed: Number[] = [];
-        for (let i = 0; i < jsonData["daily"]["time"].length; i++) {
-            const date: Date = new Date(jsonData["daily"]["time"][i].toString());
-            let dateString: String =
-                weekday[date.getDay()] +
-                ", " +
-                date.getDate() +
-                "-" +
-                date.toLocaleString('default', { month: 'long' }) +
-                "-" +
-                date.getFullYear();
-            dateData.push(dateString);
-            maxTemp.push(jsonData["daily"]["temperature_2m_max"][i]);
-            minTemp.push(jsonData["daily"]["temperature_2m_min"][i]);
-            let wind_direction: String = determineWindDirection(jsonData["daily"]["winddirection_10m_dominant"][i]);
-            windDir.push(wind_direction);
-            windSpeed.push(jsonData["daily"]["windspeed_10m_max"][i]);
-        }
-        setDate(dateData);
-        setMaxTemp(maxTemp);
-        setMinTemp(minTemp);
-        setWindDir(windDir);
-        setWindSpeed(windSpeed);
+        const answer = mapping(jsonData);
+        console.log(answer);
+        setDate(answer[0]); // date
+        setMaxTemp(answer[1]); // max temp
+        setMinTemp(answer[2]); // min temp
+        setWindDir(answer[3]); // wind speed
+        setWindSpeed(answer[4]); // wind dir
     }
 
     return (
         <View style={styles.container} testID="parent-view" onLayout={handleLayout}>
             <Header />
+            <Alarm />
             <Text style={{ marginBottom: 10 }} testID="current-city-test">Current city: {cityName}, {country}</Text>
             <View style={styles.table}>
                 <View style={styles.column} >
@@ -188,7 +202,6 @@ const styles = StyleSheet.create({
     inputStyle: {
         marginTop: 10,
         height: 40,
-        width: "30vh",
         borderColor: "gray",
         borderWidth: 1,
         marginBottom: 10

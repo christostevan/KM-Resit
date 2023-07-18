@@ -12,7 +12,7 @@ export const forecasting = async (base_url: RequestInfo) => {
 }
 
 // Hourly forecasting
-export const HourlyForecasting = async (latitude: Number, longitude: Number): Promise<any> => {
+export const PrecipicationHourlyForecasting = async (latitude: Number, longitude: Number): Promise<any> => {
     if (latitude === 0 && longitude === 0) {
         latitude = 52.7792;
         longitude = 6.9069;

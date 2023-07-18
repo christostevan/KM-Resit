@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     inputStyle: {
         marginTop: 10,
         height: 40,
-        width: "30vh",
+        width: 50,
         borderColor: "gray",
         borderWidth: 1,
         marginBottom: 10

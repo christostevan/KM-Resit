@@ -5,17 +5,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import fetchMock from "fetch-mock";
 import fetch from "jest-fetch-mock";
 import Forecasting from "./Forecasting";
-import { between, determineWindDirection, weekday } from "./Forecasting";
+import { between, determineWindDirection, weekday, mapping } from "./Forecasting";
 
-// jest.mock("../../../Service/request.tsx", () => ({
-//     CityFetch: jest.fn(() => Promise.resolve([])),
-// }));
-
-// global.fetch = require("jest-fetch-mock");
 
 describe("Forecasting unit test", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        fetch.resetMocks();
     });
     // beforeAll(() => {
     //     global.fetch = jest.fn();
@@ -29,6 +25,47 @@ describe("Forecasting unit test", () => {
         const element = screen.getAllByTestId("current-city-test");
         expect(element).toBeTruthy();
         // expect(screen.toJSON()).toMatchSnapshot();
+    });
+
+    it("Mapping() function test", () => {
+        const jsonData = {
+            daily: {
+              time: ["2023-07-19"],
+              temperature_2m_max: [21],
+              temperature_2m_min: [14.3],
+              winddirection_10m_dominant: [278],
+              windspeed_10m_max: [17.3]
+            }
+          };
+
+        const expectedResult = [
+            ["Wednesday, 19-July-2023"],
+            [21],
+            [14.3],
+            ["West wind (W)"],
+            [17.3]
+        ];
+
+        const result = mapping(jsonData);
+
+        expect(result).toEqual(expectedResult);
+        expect(result.length).toBe(5);
+        expect(result[0].length).toBe(1);
+        expect(result[1].length).toBe(1);
+        expect(result[2].length).toBe(1);
+        expect(result[3].length).toBe(1);
+        expect(result[4].length).toBe(1);
+        expect(Array.isArray(result)).toBe(true);
+        expect(Array.isArray(result[0])).toBe(true);
+        expect(Array.isArray(result[1])).toBe(true);
+        expect(Array.isArray(result[2])).toBe(true);
+        expect(Array.isArray(result[3])).toBe(true);
+        expect(Array.isArray(result[4])).toBe(true);
+        expect(result[0].every((element: Number) => typeof element === 'string')).toBe(true);
+        expect(result[1].every((element: Number) => typeof element === 'number')).toBe(true);
+        expect(result[2].every((element: Number) => typeof element === 'number')).toBe(true);
+        expect(result[3].every((element: Number) => typeof element === 'string')).toBe(true);
+        expect(result[4].every((element: Number) => typeof element === 'number')).toBe(true);
     });
 
     it("Test the between() function", () => {
