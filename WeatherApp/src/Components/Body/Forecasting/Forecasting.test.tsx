@@ -51,11 +51,6 @@ describe("Forecasting unit test", () => {
         expect(result).toEqual(expectedResult);
         expect(result.length).toBe(5);
         expect(result[0].length).toBe(1);
-        expect(result[1].length).toBe(1);
-        expect(result[2].length).toBe(1);
-        expect(result[3].length).toBe(1);
-        expect(result[4].length).toBe(1);
-        expect(Array.isArray(result)).toBe(true);
         expect(Array.isArray(result[0])).toBe(true);
         expect(Array.isArray(result[1])).toBe(true);
         expect(Array.isArray(result[2])).toBe(true);

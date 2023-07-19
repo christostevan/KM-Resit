@@ -21,6 +21,15 @@ export const PrecipicationHourlyForecasting = async (latitude: Number, longitude
     return forecasting(base_url);
 };
 
+export const DailyForecasting = async (latitude: Number, longitude: Number): Promise<any> => {
+    if (latitude === 0 && longitude === 0) {
+        latitude = 52.7792;
+        longitude = 6.9069;
+    }
+    const base_url = `http://localhost:3000/nextDayWeather?longitude=${longitude}&latitude=${latitude}`;
+    return forecasting(base_url);
+}
+
 // Forecasting the weather for the next 10 days
 export const ForecastFetch = async (latitude: Number, longitude: Number): Promise<any> => {
     // If user hasn't set up the city yet; the initial city is Emmen, NL

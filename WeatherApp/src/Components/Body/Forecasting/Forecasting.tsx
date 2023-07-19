@@ -124,7 +124,6 @@ const Forecasting: React.FC = () => {
         }
         const jsonData = await ForecastFetch(latitude, longitude);
         const answer = mapping(jsonData);
-        console.log(answer);
         setDate(answer[0]); // date
         setMaxTemp(answer[1]); // max temp
         setMinTemp(answer[2]); // min temp
