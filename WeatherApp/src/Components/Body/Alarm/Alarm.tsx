@@ -14,7 +14,7 @@ export function compare2Times(time1: Date, time2: Date): boolean {
         );
     }
     return false;
-}
+};
 
 const Alarm: React.FC = () => {
     const [latitude, setLatitude] = useState<number>(0);
@@ -50,7 +50,7 @@ const Alarm: React.FC = () => {
 
         if (true) {
             // Set alarm date
-            const alarmTime = new Date();
+            const alarmTime: Date = new Date();
             // alarmTime.setHours(alarmTime.getHours() + 1); // 1 hr in advance
             alarmTime.setMinutes(alarmTime.getMinutes() + 2);
             console.log(alarmTime);

@@ -55,8 +55,8 @@ export function mapping(jsonData: any): any {
     let minTemp: Number[] = [];
     let windDir: String[] = [];
     let windSpeed: Number[] = [];
-    for (let i = 0; i < jsonData["daily"]["time"].length; i++) {
-        const date: Date = new Date(jsonData["daily"]["time"][i].toString());
+    for (let i = 1; i < jsonData["time"].length; i++) {
+        const date: Date = new Date(jsonData["time"][i].toString());
         let dateString: String =
             weekday[date.getDay()] +
             ", " +
@@ -66,11 +66,11 @@ export function mapping(jsonData: any): any {
             "-" +
             date.getFullYear();
         dateData.push(dateString);
-        maxTemp.push(jsonData["daily"]["temperature_2m_max"][i]);
-        minTemp.push(jsonData["daily"]["temperature_2m_min"][i]);
-        let wind_direction: String = determineWindDirection(jsonData["daily"]["winddirection_10m_dominant"][i]);
+        maxTemp.push(jsonData["temperature_2m_max"][i]);
+        minTemp.push(jsonData["temperature_2m_min"][i]);
+        let wind_direction: String = determineWindDirection(jsonData["winddirection_10m_dominant"][i]);
         windDir.push(wind_direction);
-        windSpeed.push(jsonData["daily"]["windspeed_10m_max"][i]);
+        windSpeed.push(jsonData["windspeed_10m_max"][i]);
     }
     ans.push(dateData);
     ans.push(maxTemp);
@@ -88,16 +88,14 @@ const Forecasting: React.FC = () => {
     const [minTemp, setMinTemp] = useState<Number[]>([]);
     const [windDir, setWindDir] = useState<String[]>([]);
     const [windSpeed, setWindSpeed] = useState<Number[]>([]);
-    const [inputValue, setInputValue] = useState('');
-    const [latitude, setLatitude] = useState<number>(0);
-    const [longitude, setLongitude] = useState<number>(0);
-    const [cityName, setCityName] = useState<String>('');
-    const [country, setCountry] = useState<String>('');
+    const [cityName, setCityName] = useState<string>('Emmen');
+    const [country, setCountry] = useState<String>('NL');
+    const [days, setDays] = useState<number>(10);
 
     const [parentWidth, setParentWidth] = useState(null);
     const handleLayout = (event: any) => {
-      const { width } = event.nativeEvent.layout;
-      setParentWidth(width);
+        const { width } = event.nativeEvent.layout;
+        setParentWidth(width);
     };
 
     useEffect(() => {
@@ -105,24 +103,27 @@ const Forecasting: React.FC = () => {
     }, []);
 
     const handleSubmit = async (): Promise<any> => {
-        if (inputValue != '' || inputValue != null || inputValue) {
-            const jsonData = await CityFetch(inputValue);
-            setLatitude(jsonData["results"][0]["latitude"]);
-            setLongitude(jsonData["results"][0]["longitude"]);
-            setCityName(jsonData["results"][0]["name"].toString());
+        if (cityName != '' || cityName != null || cityName) {
+            const jsonData = await CityFetch(cityName);
             setCountry(jsonData["results"][0]["country_code"].toString());
             fetchingAPI();
         }
     }
 
+    const handleSubmitDay = (text: string): void => {
+        if (text === '' || text === null) {
+            setDays(0);
+        }
+        else {
+            let number: number = parseInt(text);
+            if (number > 0) {
+                setDays(number);
+            }
+        }
+    }
+
     async function fetchingAPI(): Promise<any> {
-        if (cityName === '' || cityName === null) {
-            setCityName("Emmen");
-        }
-        if (country === '' || country === null) {
-            setCountry("NL");
-        }
-        const jsonData = await ForecastFetch(latitude, longitude);
+        const jsonData = await ForecastFetch(cityName, (days + 1));
         const answer = mapping(jsonData);
         setDate(answer[0]); // date
         setMaxTemp(answer[1]); // max temp
@@ -134,8 +135,9 @@ const Forecasting: React.FC = () => {
     return (
         <View style={styles.container} testID="parent-view" onLayout={handleLayout}>
             <Header />
-            <Alarm />
+            {/* <Alarm /> */}
             <Text style={{ marginBottom: 10 }} testID="current-city-test">Current city: {cityName}, {country}</Text>
+            <Text style={{ marginBottom: 10 }} testID="current-city-test">Number of forecasting day: {days.toString()}</Text>
             <View style={styles.table}>
                 <View style={styles.column} >
                     <Text testID="Date-test">Date</Text>
@@ -162,12 +164,23 @@ const Forecasting: React.FC = () => {
             <View style={styles.form}>
                 <TextInput
                     style={styles.inputStyle}
-                    value={inputValue}
-                    onChangeText={text => setInputValue(text)}
+                    value={cityName}
+                    onChangeText={text => setCityName(text)}
                     placeholder="Input your city here...."
                     testID="TextInput-test"
                 />
-                <Button title="Submit" onPress={handleSubmit} testID="SubmitButton-test"/>
+                <Button title="Submit" onPress={handleSubmit} testID="SubmitButton-test" />
+            </View>
+            <Text>Set how many days: </Text>
+            <View style={styles.form}>
+                <TextInput
+                    style={styles.inputStyle}
+                    value={days.toString()}
+                    onChangeText={text => handleSubmitDay(text)}
+                    placeholder="Input your days here here...."
+                    testID="TextInput-test"
+                />
+                <Button title="Submit" onPress={fetchingAPI} testID="SubmitButton-test" />
             </View>
         </View>
     );

@@ -29,13 +29,11 @@ describe("Forecasting unit test", () => {
 
     it("Mapping() function test", () => {
         const jsonData = {
-            daily: {
               time: ["2023-07-19"],
               temperature_2m_max: [21],
               temperature_2m_min: [14.3],
               winddirection_10m_dominant: [278],
               windspeed_10m_max: [17.3]
-            }
           };
 
         const expectedResult = [

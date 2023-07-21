@@ -26,20 +26,15 @@ export const DailyForecasting = async (latitude: Number, longitude: Number): Pro
         latitude = 52.7792;
         longitude = 6.9069;
     }
-    const base_url = `http://localhost:3000/nextDayWeather?longitude=${longitude}&latitude=${latitude}`;
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/weatherForecast?city=Emmen&days=10`;
     return forecasting(base_url);
 }
 
 // Forecasting the weather for the next 10 days
-export const ForecastFetch = async (latitude: Number, longitude: Number): Promise<any> => {
-    // If user hasn't set up the city yet; the initial city is Emmen, NL
-    if (latitude === 0 && longitude === 0) {
-        latitude = 52.7792;
-        longitude = 6.9069;
-    }
+export const ForecastFetch = async (city: string, days: number): Promise<any> => {
     let tomorrow: String = dateToString(getDatePlus(1));
     let tenDays: String = dateToString(getDatePlus(10));
-    const base_url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toString()}&longitude=${longitude.toString()}&daily=temperature_2m_max,temperature_2m_min,windspeed_10m_max,winddirection_10m_dominant&timezone=auto&start_date=${tomorrow}&end_date=${tenDays}`;
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/weatherForecast?city=${city}&days=${days}`;
     return forecasting(base_url);
 };
 
