@@ -11,26 +11,22 @@ export const forecasting = async (base_url: RequestInfo) => {
     }
 }
 
-// Hourly forecasting
-export const PrecipicationHourlyForecasting = async (latitude: Number, longitude: Number): Promise<any> => {
-    if (latitude === 0 && longitude === 0) {
-        latitude = 52.7792;
-        longitude = 6.9069;
-    }
-    const base_url = `http://localhost:3000/currentWeather?longitude=${longitude}&latitude=${latitude}`;
+// Epic 1 Hourly forecasting
+export const PrecipicationHourlyForecasting = async (city: string): Promise<any> => {
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/currentWeather?city=${city}`;
     return forecasting(base_url);
 };
 
-// Forecasting the weather for the next 10 days
-export const ForecastFetch = async (latitude: Number, longitude: Number): Promise<any> => {
-    // If user hasn't set up the city yet; the initial city is Emmen, NL
-    if (latitude === 0 && longitude === 0) {
-        latitude = 52.7792;
-        longitude = 6.9069;
-    }
+export const DailyForecasting = async (city: string): Promise<any> => {
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=New%20York`;
+    return forecasting(base_url);
+}
+
+// Epic 2: Forecasting the weather for the next 10 days
+export const ForecastFetch = async (city: string, days: number): Promise<any> => {
     let tomorrow: String = dateToString(getDatePlus(1));
     let tenDays: String = dateToString(getDatePlus(10));
-    const base_url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toString()}&longitude=${longitude.toString()}&daily=temperature_2m_max,temperature_2m_min,windspeed_10m_max,winddirection_10m_dominant&timezone=auto&start_date=${tomorrow}&end_date=${tenDays}`;
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/weatherForecast?city=${city}&days=${days}`;
     return forecasting(base_url);
 };
 
@@ -67,36 +63,8 @@ export function dateToString(date_object: Date): String {
 };
 
 // Forecasting historical data for avg temp and precipitation for the last 20 years
-export const HistoricalFetch = async (latitude: Number, longitude: Number): Promise<any> => {
-    // If user hasn't set up the city yet; the initial city is Emmen, NL
-    if (latitude === 0 && longitude === 0) {
-        latitude = 52.7792;
-        longitude = 6.9069;
-    }
-
-    // For determining the date (always date 1 for the start date, and date 31/30/29/28 for the end date)
-    let today: Date = new Date();
-    today.setMonth(today.getMonth() - 1);
-    if (today.getMonth() === 2) {
-        if (determineLeapYear(today.getFullYear())) {
-            today.setDate(29);
-        } else {
-            today.setDate(28);
-        }
-    } else {
-        if (determineMonth(today.getMonth())) {
-            today.setDate(31);
-        } else {
-            today.setDate(30);
-        }
-    }
-    let todayString: String = dateToString(today);
-    let twentyYears: Date = today;
-    twentyYears.setFullYear(today.getFullYear() - 20);
-    twentyYears.setDate(1);
-    let twentyYearsString: String = dateToString(twentyYears);
-
-    const base_url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${twentyYearsString}&end_date=${todayString}&daily=temperature_2m_mean,precipitation_sum&timezone=GMT`;
+export const HistoricalFetch = async (city: string): Promise<any> => {
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/weatherHistory?city=${city}`;
     return forecasting(base_url);
 };
 

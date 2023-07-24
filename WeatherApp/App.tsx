@@ -27,7 +27,6 @@ export default function App() {
         }}>
         <Stack.Screen name="Forecasting" component={Forecasting} />
         <Stack.Screen name="Historical" component={Historical} />
-        <Stack.Screen name="Alarm" component={Alarm} />
       </Stack.Navigator>
     </NavigationContainer>
   );
