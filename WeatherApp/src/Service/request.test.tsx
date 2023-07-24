@@ -3,7 +3,7 @@ import { render, screen, cleanup, fireEvent, waitFor, act } from "@testing-libra
 import * as request from '../Service/request';
 import fetchMock from "fetch-mock";
 import fetch from "jest-fetch-mock";
-import { determineLeapYear, determineMonth, dateToString, forecasting } from "../Service/request";
+import { determineLeapYear, determineMonth, dateToString, forecasting, DailyForecasting } from "../Service/request";
 
 global.fetch = require("jest-fetch-mock");
 describe("Request test", () => {
@@ -112,6 +112,43 @@ describe("Request test", () => {
 
         jest.restoreAllMocks();
     });
+
+    // it("Daily forecasting test", async () => {
+    //     const cityName = 'ValidCity';
+    //     const mockData = { result: false };
+    //     const mockForecasting = jest.fn().mockResolvedValue(mockData);
+    
+    //     // Mock the 'forecasting' function used inside 'DailyForecasting'
+    //     jest.mock('../Service/request', () => ({
+    //       forecasting: mockForecasting,
+    //     }));
+    
+    //     // Call the 'DailyForecasting' function
+    //     const result = await DailyForecasting(cityName);
+    
+    //     // Assertions for the expected output
+    //     expect(mockForecasting).toHaveBeenCalledTimes(1);
+    //     expect(mockForecasting).toHaveBeenCalledWith(
+    //       `https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=${cityName}`
+    //     );
+    //     // expect(result).toEqual(mockData);
+    // }); 
+
+    it("throws an error when fetch fails", async () => {
+        // Mock a failed response by setting response.ok to false
+        fetch.mockResponseOnce(JSON.stringify({}), { status: 404 });
+    
+        // Set up a mock function for handleTypeChange
+        const handleTypeChangeMock = jest.fn();
+    
+        // Invoke the function being tested with a non-empty input
+        await expect(
+          forecasting("https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=Emmen")
+        ).rejects.toThrow("Error while fetching: Error while retrieving data");
+    
+        // Assert that handleTypeChange was not called
+        expect(handleTypeChangeMock).not.toHaveBeenCalled();
+      });
 
     it("Determines months correctly", () => {
         expect(request.determineMonth(0)).toBe(true);

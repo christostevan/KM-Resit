@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Alert, Switch } from 'react-native';
 import { Table, Row, Rows } from "react-native-table-component";
 import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
@@ -48,7 +48,7 @@ export function between(x: number, min: number, max: number): boolean {
     return x >= min && x <= max;
 };
 
-export function mapping(jsonData: any): any {
+export function mapping(jsonData: any, isCelcius: boolean): any {
     let ans = [];
     let dateData: String[] = [];
     let maxTemp: Number[] = [];
@@ -66,6 +66,11 @@ export function mapping(jsonData: any): any {
             "-" +
             date.getFullYear();
         dateData.push(dateString);
+        if (!isCelcius) {
+            jsonData["temperature_2m_max"][i] = convertToFahrenheit(jsonData["temperature_2m_max"][i]).toFixed(1);
+            jsonData["temperature_2m_min"][i] = convertToFahrenheit(jsonData["temperature_2m_min"][i]).toFixed(1);
+            jsonData["windspeed_10m_max"][i] = convertToMilesPerHour(jsonData["windspeed_10m_max"][i]).toFixed(1);
+        }
         maxTemp.push(jsonData["temperature_2m_max"][i]);
         minTemp.push(jsonData["temperature_2m_min"][i]);
         let wind_direction: String = determineWindDirection(jsonData["winddirection_10m_dominant"][i]);
@@ -82,6 +87,22 @@ export function mapping(jsonData: any): any {
 
 export const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+export const getTemperatureUnitLabel = (unit: boolean) => {
+    return unit ? '(°C)' : '(°F)';
+};
+
+export const getWindSpeedUnitLabel = (unit: boolean) => {
+    return unit ? '(Km/h)' : '(Mph)';
+};
+
+export const convertToFahrenheit = (temp: number): number => {
+    return (temp * 9) / 5 + 32;
+};
+
+export const convertToMilesPerHour = (speed: number): number => {
+    return speed / 1.60934;
+};
+
 const Forecasting: React.FC = () => {
     const [date, setDate] = useState<String[]>([]);
     const [maxTemp, setMaxTemp] = useState<Number[]>([]);
@@ -91,6 +112,7 @@ const Forecasting: React.FC = () => {
     const [cityName, setCityName] = useState<string>('Emmen');
     const [country, setCountry] = useState<String>('NL');
     const [days, setDays] = useState<number>(10);
+    const [isCelcius, setIsCelcius] = useState<boolean>(true);
 
     const [parentWidth, setParentWidth] = useState(null);
     const handleLayout = (event: any) => {
@@ -124,7 +146,7 @@ const Forecasting: React.FC = () => {
 
     async function fetchingAPI(): Promise<any> {
         const jsonData = await ForecastFetch(cityName, (days + 1));
-        const answer = mapping(jsonData);
+        const answer = mapping(jsonData, isCelcius);
         setDate(answer[0]); // date
         setMaxTemp(answer[1]); // max temp
         setMinTemp(answer[2]); // min temp
@@ -132,10 +154,14 @@ const Forecasting: React.FC = () => {
         setWindSpeed(answer[4]); // wind dir
     }
 
+    const changeUnit = () => {
+        setIsCelcius((prev) => !prev);
+    };
+
     return (
         <View style={styles.container} testID="parent-view" onLayout={handleLayout}>
             <Header />
-            {/* <Alarm /> */}
+            <Alarm cityName={cityName}/>
             <Text style={{ marginBottom: 10 }} testID="current-city-test">Current city: {cityName}, {country}</Text>
             <Text style={{ marginBottom: 10 }} testID="current-city-test">Number of forecasting day: {days.toString()}</Text>
             <View style={styles.table}>
@@ -144,15 +170,15 @@ const Forecasting: React.FC = () => {
                     {date?.map((el, i) => <Text key={i} testID="date-element-test"> {el}</Text>)}
                 </View>
                 <View style={styles.column}>
-                    <Text>Max Temp (°C)</Text>
+                    <Text>Max Temp {getTemperatureUnitLabel(isCelcius)}</Text>
                     {maxTemp?.map((el, i) => <Text key={i}> {el.toString()} </Text>)}
                 </View>
                 <View style={styles.column}>
-                    <Text>Min Temp (°C)</Text>
+                    <Text>Min Temp {getTemperatureUnitLabel(isCelcius)}</Text>
                     {minTemp?.map((el, i) => <Text key={i}> {el.toString()}</Text>)}
                 </View>
                 <View style={styles.column}>
-                    <Text>Wind Speed (Km/h)</Text>
+                    <Text>Wind Speed {getWindSpeedUnitLabel(isCelcius)}</Text>
                     {windSpeed?.map((el, i) => <Text key={i}> {el.toString()} </Text>)}
                 </View>
                 <View>
@@ -178,9 +204,14 @@ const Forecasting: React.FC = () => {
                     value={days.toString()}
                     onChangeText={text => handleSubmitDay(text)}
                     placeholder="Input your days here here...."
-                    testID="TextInput-test"
+                    testID="TextInputDay-test"
                 />
-                <Button title="Submit" onPress={fetchingAPI} testID="SubmitButton-test" />
+                <Button title="Submit" onPress={fetchingAPI} testID="SubmitButtonDay-test" />
+            </View>
+            <View style={styles.form}>
+                <Text>Set units in Celcius and Km</Text>
+                <Switch value={isCelcius} onValueChange={changeUnit} />
+                <Button title="Apply" onPress={fetchingAPI} testID="SubmitButtonUnit-test" />
             </View>
         </View>
     );

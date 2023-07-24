@@ -1,132 +1,116 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Platform, Button, Alert, Text } from "react-native";
-import { Audio } from "expo-av";
-import * as Notification from "expo-notifications";
+// import { Audio } from "expo-av";
 // import Sound from "react-native-sound";
 // import Alarm from "react-native-alarm-manager";
-// import { PrecipicationHourlyForecasting, DailyForecasting } from "../../../Service/request";
+import * as Notification from "expo-notifications";
+import { PrecipicationHourlyForecasting, DailyForecasting } from "../../../Service/request";
 
-export function compare2Times(time1: Date, time2: Date): boolean {
-    if (time1 && time2) {
-        return (
-            time1.getHours() === time2.getHours() &&
-            time1.getMinutes() === time2.getMinutes()
-        );
-    }
-    return false;
-};
+interface alarmProps {
+    cityName: string;
+}
 
-const Alarm: React.FC = () => {
-    const [latitude, setLatitude] = useState<number>(0);
-    const [longitude, setLongitude] = useState<number>(0);
-    const [time, setTime] = useState<Date | null>(null);
-    const [precipication, setPrecipitation] = useState<String>('');
+const Alarm: React.FC<alarmProps> = ({ cityName }) => {
+    // const [time, setTime] = useState<Date | null>(null);
     // const alarmSound = useRef<Sound | HTMLAudioElement | null>(null);
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
+    // const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     useEffect(() => {
-        // fecthAPIDaily();
-        fetchAPIHourly();
+        fecthAPIDaily();
+        // fetchAPIHourly();
 
-        // Schedule subsequent API calls every hour
-        const interval = setInterval(() => {
-            fetchAPIHourly();
-        }, 3600000); // 1 hr in milliseconds
+        // // Schedule subsequent API calls every hour
+        // const interval = setInterval(() => {
+        //     fetchAPIHourly();
+        // }, 3600000); // 1 hr in milliseconds
 
         return () => {
             // Clear the interval when the component is unmounted
-            clearInterval(interval);
-            sound
-                ? () => {
-                    sound.unloadAsync();
-                }
-                : undefined;
+            // clearInterval(interval);
+            // sound
+            //     ? () => {
+            //         sound.unloadAsync();
+            //     }
+            //     : undefined;
         };
-    }, [sound]);
+    });
 
     // For showing an alert 15 mins before if the precipication forecasting is bad
-    async function fetchAPIHourly(): Promise<any> {
-        // const jsonData = await PrecipicationHourlyForecasting(0, 0);
+    // async function fetchAPIHourly(): Promise<any> {
+    //     const jsonData = await PrecipicationHourlyForecasting(cityName);
 
-        if (true) {
-            // Set alarm date
-            const alarmTime: Date = new Date();
-            // alarmTime.setHours(alarmTime.getHours() + 1); // 1 hr in advance
-            alarmTime.setMinutes(alarmTime.getMinutes() + 2);
-            console.log(alarmTime);
-            setTime(alarmTime);
-            // alert(alarmTime);
-            // setPrecipitation(jsonData["report"].toString());
-            scheduleNotification(alarmTime);
-        }
-    };
+    //     if (jsonData["report"] !== "null") {
+    //         // Set alarm date
+    //         const alarmTime: Date = new Date();
+    //         // alarmTime.setHours(alarmTime.getHours() + 3); // 1 hr in advance
+    //         alarmTime.setMinutes(alarmTime.getMinutes() + 2); // Comment later
+    //         console.log(alarmTime);
 
-    function checkAlarm() {
-        if (time) {
-            const currentTime: Date = new Date();
-            if (compare2Times(currentTime, time)) {
-                playSound("askjskajdska");
-            }
-        }
-    };
+    //         // const triggerTime = alarmTime.getTime() - (15 * 60 * 1000); // 15 mins before
+    //         // alert(alarmTime);
+    //         scheduleNotification(alarmTime, jsonData["report"].toString());
+    //     }
+    // };
 
-    const scheduleNotification = (time: Date) => {
-        const triggerTime = time.getTime() - (1 * 60 * 1000); // 15 mins before
-        let date1 = new Date(triggerTime);
-        console.log(date1);
+    const scheduleNotification = (time: Date, description: string) => {
+
         Notification.scheduleNotificationAsync({
             content: {
                 title: 'Bad weather',
-                body: "test",
+                body: description + "is expected",
             },
             trigger: {
-                date: new Date(triggerTime),
+                date: new Date(time)
+                // seconds: Math.floor(scheduleTime.getTime() / 1000)
             }
-        }); 
+        });
     }
 
     async function fecthAPIDaily(): Promise<any> {
-        // const jsonData = await DailyForecasting(0, 0);
-        // if (jsonData["result"] === true) {
-        //     playSound(jsonData["type"].toString());
-        // }
-    };
-
-    const playSound = async (data: String) => {
-
-        alert(data + " is expected");
-        try {
-            const { sound } = await Audio.Sound.createAsync(
-                require('../../../../sound/alarm.mp3'),
-                { shouldPlay: true }
-            );
-            Alert.alert(
-                data + " is expected",
-                "Press ok to stop the sound",
-                [{ text: 'OK', onPress: stopSound }],
-                { cancelable: false }
-            );
-            await sound.playAsync();
-            setSound(sound);
-        } catch (error) {
-            console.log('Error while loading the sound:', error);
+        const jsonData = await DailyForecasting(cityName);
+        if (jsonData["result"] === true) {
+            const alarmTime: Date = new Date();
+            const scheduleTime = new Date(alarmTime.getTime() + (1 * 60 * 1000));
+            // alarmTime.setMinutes(alarmTime.getMinutes() + 1 * 60 * 1000); // Comment later
+            scheduleNotification(scheduleTime, "High " + jsonData["type"])
         }
     };
 
-    const stopSound = async () => {
-        try {
-            if (sound) {
-                await sound.stopAsync();
-            }
-        } catch (error) {
-            console.log('Error while stopping the sound:', error);
-        }
-    };
+    // const playSound = async (data: String) => {
+
+    //     alert(data + " is expected");
+    //     try {
+    //         const { sound } = await Audio.Sound.createAsync(
+    //             require('../../../../sound/alarm.mp3'),
+    //             { shouldPlay: true }
+    //         );
+    //         Alert.alert(
+    //             data + " is expected",
+    //             "Press ok to stop the sound",
+    //             [{ text: 'OK', onPress: stopSound }],
+    //             { cancelable: false }
+    //         );
+    //         await sound.playAsync();
+    //         // setSound(sound);
+    //     } catch (error) {
+    //         console.log('Error while loading the sound:', error);
+    //     }
+    // };
+
+    // const stopSound = async () => {
+    //     try {
+    //         if (sound) {
+    //             await sound.stopAsync();
+    //         }
+    //     } catch (error) {
+    //         console.log('Error while stopping the sound:', error);
+    //     }
+    // };
 
 
     return (
         <View>
-            <Text>{time?.toDateString()}</Text>
+            <Text></Text>
         </View>
     )
 }

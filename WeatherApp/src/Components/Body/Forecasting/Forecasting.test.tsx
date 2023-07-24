@@ -5,8 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import fetchMock from "fetch-mock";
 import fetch from "jest-fetch-mock";
 import Forecasting from "./Forecasting";
-import { between, determineWindDirection, weekday, mapping } from "./Forecasting";
-
+import { between, determineWindDirection, weekday, mapping, getTemperatureUnitLabel, getWindSpeedUnitLabel, convertToFahrenheit, convertToMilesPerHour } from "./Forecasting";
 
 describe("Forecasting unit test", () => {
     beforeEach(() => {
@@ -29,12 +28,12 @@ describe("Forecasting unit test", () => {
 
     it("Mapping() function test", () => {
         const jsonData = {
-              time: ["2023-07-19"],
-              temperature_2m_max: [21],
-              temperature_2m_min: [14.3],
-              winddirection_10m_dominant: [278],
-              windspeed_10m_max: [17.3]
-          };
+            time: ["2023-07-19", "2023-07-19"],
+            temperature_2m_max: [20, 21],
+            temperature_2m_min: [14, 14.3],
+            winddirection_10m_dominant: [270, 278],
+            windspeed_10m_max: [17, 17.3]
+        };
 
         const expectedResult = [
             ["Wednesday, 19-July-2023"],
@@ -44,7 +43,7 @@ describe("Forecasting unit test", () => {
             [17.3]
         ];
 
-        const result = mapping(jsonData);
+        const result = mapping(jsonData, true);
 
         expect(result).toEqual(expectedResult);
         expect(result.length).toBe(5);
@@ -59,6 +58,21 @@ describe("Forecasting unit test", () => {
         expect(result[2].every((element: Number) => typeof element === 'number')).toBe(true);
         expect(result[3].every((element: Number) => typeof element === 'string')).toBe(true);
         expect(result[4].every((element: Number) => typeof element === 'number')).toBe(true);
+    });
+
+    it("Test displaying units", () => {
+        expect(getTemperatureUnitLabel(true)).toBe('(°C)');
+        expect(getTemperatureUnitLabel(false)).toBe('(°F)');
+        expect(getWindSpeedUnitLabel(true)).toBe('(Km/h)');
+        expect(getWindSpeedUnitLabel(false)).toBe('(Mph)');
+    });
+
+    it("Converting temperatures and distances", () => {
+        expect(convertToFahrenheit(0)).toBe(32);
+        expect(convertToFahrenheit(100)).toBe(212);
+        expect(convertToFahrenheit(-40)).toBe(-40);
+        expect(convertToMilesPerHour(0)).toBe(0);
+        expect(convertToMilesPerHour(1.609344)).toBeCloseTo(1, 4);
     });
 
     it("Test the between() function", () => {
@@ -172,7 +186,6 @@ describe("Forecasting unit test", () => {
         const views = UNSAFE_getAllByType(View);
         expect(views[1].props.style.width).toBe("100%");
     });
-
 
     it("Text Input test", () => {
         render(
