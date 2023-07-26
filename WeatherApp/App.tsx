@@ -5,13 +5,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Forecasting from "./src/Components/Body/Forecasting/Forecasting";
 import Historical from "./src/Components/Body/Historical/Historical";
-import Alarm from "./src/Components/Body/Alarm/Alarm"
+import Login from "./src/Components/Body/UserAuthentication/Login/Login";
+import Register from "./src/Components/Body/UserAuthentication/Register/Register";
 
 // Type checking navigator. Make 'screens' directory to contain screens that the app has
 export type RootStackParamList = {
   Forecasting: undefined;
   Historical: undefined;
   Alarm: undefined;
+  Login: undefined;
+  Register: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -21,12 +24,14 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Stack.Navigator initialRouteName="Forecasting"
+      <Stack.Navigator initialRouteName="Login"
         screenOptions={{
           headerShown: false, // Hide navigation bar by default
         }}>
         <Stack.Screen name="Forecasting" component={Forecasting} />
         <Stack.Screen name="Historical" component={Historical} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
       </Stack.Navigator>
     </NavigationContainer>
   );

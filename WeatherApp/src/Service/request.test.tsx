@@ -4,12 +4,20 @@ import * as request from '../Service/request';
 import fetchMock from "fetch-mock";
 import fetch from "jest-fetch-mock";
 import { determineLeapYear, determineMonth, dateToString, forecasting, DailyForecasting } from "../Service/request";
+import axios from "axios";
 
 global.fetch = require("jest-fetch-mock");
+jest.mock('axios', () => ({
+    post: jest.fn(),
+}));
+
 describe("Request test", () => {
     beforeEach(() => {
         // Reset the fetch mock before each test case
         fetch.resetMocks();
+    });
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     it("Basic fetching function from API test", async () => {
@@ -117,15 +125,15 @@ describe("Request test", () => {
     //     const cityName = 'ValidCity';
     //     const mockData = { result: false };
     //     const mockForecasting = jest.fn().mockResolvedValue(mockData);
-    
+
     //     // Mock the 'forecasting' function used inside 'DailyForecasting'
     //     jest.mock('../Service/request', () => ({
     //       forecasting: mockForecasting,
     //     }));
-    
+
     //     // Call the 'DailyForecasting' function
     //     const result = await DailyForecasting(cityName);
-    
+
     //     // Assertions for the expected output
     //     expect(mockForecasting).toHaveBeenCalledTimes(1);
     //     expect(mockForecasting).toHaveBeenCalledWith(
@@ -137,18 +145,122 @@ describe("Request test", () => {
     it("throws an error when fetch fails", async () => {
         // Mock a failed response by setting response.ok to false
         fetch.mockResponseOnce(JSON.stringify({}), { status: 404 });
-    
+
         // Set up a mock function for handleTypeChange
         const handleTypeChangeMock = jest.fn();
-    
+
         // Invoke the function being tested with a non-empty input
         await expect(
-          forecasting("https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=Emmen")
+            forecasting("https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=Emmen")
         ).rejects.toThrow("Error while fetching: Error while retrieving data");
-    
+
         // Assert that handleTypeChange was not called
         expect(handleTypeChangeMock).not.toHaveBeenCalled();
-      });
+    });
+
+    it("Fetch database test", async () => {
+        const base_url = 'https://example.com/api/user';
+        const username = 'testuser';
+        const password = 'testpassword';
+        const responseData = { id: 1, username: 'testuser', email: 'test@example.com' };
+        const response = { data: responseData };
+
+        // Mock the axios.post function to return a custom response
+        (axios.post as jest.MockedFunction<typeof axios.post>).mockResolvedValueOnce(response);
+
+        const result = await request.UserFetch(base_url, username, password);
+
+        expect(axios.post).toHaveBeenCalledTimes(1);
+        expect(axios.post).toHaveBeenCalledWith(base_url, { username, password });
+
+        expect(result).toEqual(responseData);
+    });
+
+    it('Should throw an error when fetching data fails', async () => {
+        const base_url = 'https://example.com/api/user';
+        const username = 'testuser';
+        const password = 'testpassword';
+
+        const errorMessage = 'Network Error';
+        const error = new Error(errorMessage);
+
+        // Mock the axios.post function to throw an error
+        (axios.post as jest.MockedFunction<typeof axios.post>).mockRejectedValueOnce(error);
+
+        try {
+            await request.UserFetch(base_url, username, password);
+        } catch (e: any) {
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(axios.post).toHaveBeenCalledWith(base_url, { username, password });
+
+            expect(e.message).toBe('Error while fetching data: ' + errorMessage);
+        }
+    });
+
+    it("Should fetch user data for login function", async () => {
+        const username = 'testuser';
+        const password = 'testpassword';
+
+        const responseData = { id: 1, username: 'testuser', email: 'test@example.com' };
+        const response = { data: responseData };
+
+        // Mock the axios.post function to return a custom response
+        (axios.post as jest.MockedFunction<typeof axios.post>).mockResolvedValueOnce(response);
+
+        const result = await request.LoginFetch(username, password);
+
+        expect(axios.post).toHaveBeenCalledTimes(1);
+        expect(axios.post).toHaveBeenCalledWith(
+            'https://km-resit-weatherapp.azurewebsites.net/database/login',
+            { username, password }
+        );
+
+        expect(result).toEqual(responseData);
+    });
+
+    it('Should throw an error when username is empty for login function', async () => {
+        const username = '';
+        const password = 'testpassword';
+
+        try {
+            await request.LoginFetch(username, password);
+        } catch (e: any) {
+            expect(e.message).toBe('Username cannot be null');
+        }
+    });
+
+    it('Should fetch user data for registration', async () => {
+        const username = 'testuser';
+        const password = 'testpassword';
+
+        const responseData = { id: 1, username: 'testuser', email: 'test@example.com' };
+        const response = { data: responseData };
+
+        // Mock the axios.post function to return a custom response
+        (axios.post as jest.MockedFunction<typeof axios.post>).mockResolvedValueOnce(response);
+
+        const result = await request.RegisterFetch(username, password);
+
+        expect(axios.post).toHaveBeenCalledTimes(1);
+        expect(axios.post).toHaveBeenCalledWith(
+            'https://km-resit-weatherapp.azurewebsites.net/database/register',
+            { username, password }
+        );
+
+
+        expect(result).toEqual(responseData);
+    });
+
+    it('should throw an error when username is empty for register function', async () => {
+        const username = '';
+        const password = 'testpassword';
+
+        try {
+            await request.RegisterFetch(username, password);
+        } catch (e: any) {
+            expect(e.message).toBe('Username cannot be null');
+        }
+    });
 
     it("Determines months correctly", () => {
         expect(request.determineMonth(0)).toBe(true);

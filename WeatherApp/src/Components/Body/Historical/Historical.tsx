@@ -84,7 +84,7 @@ const Historical: React.FC = () => {
             <View style={styles.table}>
                 <View style={styles.column}>
                     <Text style={styles.columnData}>Date</Text>
-                    <Text style={styles.columnDataSpecial}>Average temp {getTemperatureUnitLabel(isCelcius)}</Text>
+                    <Text style={styles.columnDataSpecial} testID="averageTemp-test">Average temp <Text testID="unitTempLabel-test">{getTemperatureUnitLabel(isCelcius)}</Text></Text>
                     <Text style={styles.columnData}>Average Precipitation (mm)</Text>
                 </View>
                 {Array.from(historicalData.entries()).map(([month, data]) => (
@@ -113,7 +113,7 @@ const Historical: React.FC = () => {
             </View>
             <View style={styles.form}>
                 <Text>Set units in Celcius</Text>
-                <Switch value={isCelcius} onValueChange={changeUnit} />
+                <Switch value={isCelcius} onValueChange={changeUnit} testID="switch-test"/>
                 <Button title="Apply" onPress={fetchAPI} testID="SubmitButtonUnit-test" />
             </View>
         </View>

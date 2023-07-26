@@ -8,6 +8,11 @@ import { RootStackParamList } from "../../../App";
 // Defines screen on the root path
 type historicalScreenProp = StackNavigationProp<RootStackParamList, "Historical", "Forecasting">;
 
+/**
+ * Header - handles the navigation logic
+ * @param empty
+ * @returns pages 
+ */
 const Header = () => {
     const navigation = useNavigation<historicalScreenProp>();
 
