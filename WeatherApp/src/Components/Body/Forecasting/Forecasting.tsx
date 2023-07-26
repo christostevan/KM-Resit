@@ -5,6 +5,8 @@ import { CityFetch } from "../../../Service/request";
 import { ForecastFetch } from "../../../Service/request";
 import Header from "../../Header/Header";
 import Alarm from "../Alarm/Alarm";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../../../../App";
 
 export function determineWindDirection(windDirection: number): String {
     if (between(windDirection, 0, 22.4)) {
@@ -103,7 +105,22 @@ export const convertToMilesPerHour = (speed: number): number => {
     return speed / 1.60934;
 };
 
+// interface ForecastingProps {
+//     parameter: any; 
+//   }
+
+// Define the type for the route prop
+// type ForecastingRouteProp = RouteProp<Record<string, RootStackParamList>, 'Forecasting'>;
+
+/**
+ * Forecasting - this page is responsible for showing the user the forecasting data for the next 10 days (epic 12, along with containing epic 1 functionality page
+ * @param empty
+ * @returns forecasting data
+ */
 const Forecasting: React.FC = () => {
+    // const route = useRoute<ForecastingRouteProp>();
+    
+    // const parameterData = route.params?.jsonData || "Emmen";
     const [date, setDate] = useState<String[]>([]);
     const [maxTemp, setMaxTemp] = useState<Number[]>([]);
     const [minTemp, setMinTemp] = useState<Number[]>([]);
@@ -124,6 +141,7 @@ const Forecasting: React.FC = () => {
         fetchingAPI();
     }, []);
 
+    // 
     const handleSubmit = async (): Promise<any> => {
         if (cityName != '' || cityName != null || cityName) {
             const jsonData = await CityFetch(cityName);

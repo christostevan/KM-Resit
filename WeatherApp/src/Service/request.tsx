@@ -48,14 +48,12 @@ export const PrecipicationHourlyForecasting = async (city: string): Promise<any>
 };
 
 export const DailyForecasting = async (city: string): Promise<any> => {
-    const base_url = `https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=New%20York`;
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/nextDayWeather?city=${city}`;
     return forecasting(base_url);
 };
 
 // Epic 2: Forecasting the weather for the next 10 days
 export const ForecastFetch = async (city: string, days: number): Promise<any> => {
-    let tomorrow: String = dateToString(getDatePlus(1));
-    let tenDays: String = dateToString(getDatePlus(10));
     const base_url = `https://km-resit-weatherapp.azurewebsites.net/weatherForecast?city=${city}&days=${days}`;
     return forecasting(base_url);
 };
@@ -74,9 +72,17 @@ export const LoginFetch = async (username: string, password: string): Promise<an
     if (username === '' || username === null) {
         throw new Error("Username cannot be null");
     }
-    const base_url = `http://localhost:3000/database/login`;
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/database/login`;
     return UserFetch(base_url, username, password);
-}
+};
+
+export const RegisterFetch = async (username: string, password: string): Promise<any> => {
+    if (username === '' || username === null) {
+        throw new Error("Username cannot be null");
+    }
+    const base_url = `https://km-resit-weatherapp.azurewebsites.net/database/register`;
+    return UserFetch(base_url, username, password);
+};
 
 // Getting the Date from today + user input day 
 export function getDatePlus(day: number): Date {
